@@ -2,6 +2,8 @@ package com.ednevnik.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,6 +11,11 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import com.ednevnik.security.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +31,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE korisnik SET obrisano = true WHERE id=? AND verzija=?")
+@Where(clause = "obrisano=false")
 public class KorisnikEntity {
 
 	@Id
@@ -34,19 +43,25 @@ public class KorisnikEntity {
 
 	@Column(name = "korisnicko_ime")
 	@JsonView(Views.UcenikView.class)
+	@NotBlank(message = "Korisnicko ime ne moze biti prazno polje")
 	private String korisnickoIme;
 
 	@JsonIgnore
 	private String sifra;
 
 	@JsonView(Views.AdminView.class)
+	@Enumerated(EnumType.STRING)
 	protected EUlogaEntity uloga;
 
 	@JsonView(Views.UcenikView.class)
+	@NotBlank(message = "Ime ne moze biti prazno polje")
 	protected String ime;
 
 	@JsonView(Views.UcenikView.class)
+	@NotBlank(message = "Prezime ne moze biti prazno polje")
 	protected String prezime;
+
+	protected boolean obrisano;
 
 	@Version
 	@JsonView(Views.AdminView.class)

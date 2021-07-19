@@ -1,9 +1,12 @@
 package com.ednevnik.repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
+import com.ednevnik.entities.OdeljenjeEntity;
 import com.ednevnik.entities.UcenikEntity;
 
-public interface UcenikRepository extends CrudRepository<UcenikEntity, Integer> {
+public interface UcenikRepository extends KorisnikGenericRepository<UcenikEntity> {
+
+	public List<UcenikEntity> findByOdeljenje(OdeljenjeEntity odeljenje);
 
 }
