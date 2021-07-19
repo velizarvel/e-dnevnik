@@ -19,6 +19,7 @@ import com.ednevnik.entities.KorisnikEntity;
 import com.ednevnik.entities.dto.KorisnikTokenDTO;
 import com.ednevnik.repositories.KorisnikRepository;
 import com.ednevnik.utils.Encryption;
+import com.ednevnik.utils.RESTError;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,7 +46,9 @@ public class LoginController {
 			korisnikDTO.setToken(token);
 			return new ResponseEntity<>(korisnikDTO, HttpStatus.OK);
 		}
-		return new ResponseEntity<>("Pogresno korisnicko ime ili lozinka", HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<>(
+				new RESTError(HttpStatus.UNAUTHORIZED.value(), "Pogresno korisnicko ime ili lozinka."),
+				HttpStatus.UNAUTHORIZED);
 	}
 
 	private String getJWTToken(KorisnikEntity korisnik) {

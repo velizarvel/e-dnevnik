@@ -9,12 +9,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
@@ -30,26 +32,31 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// proverimo da li postoji jwt
-		if (checkIfExists(request)) {
-			// ako je poslat proverimo da li je validan
-			Claims claims = validateToken(request);
-			if (claims.get("authorities") != null) {
-				// ako je validan onda postavimo security context na osnovu toga sto smo
-				// iscitali iz tokena (roles)
-				setUpSpringAuthentication(claims);
+		try {
+			// proverimo da li postoji jwt
+			if (checkIfExists(request)) {
+				// ako je poslat proverimo da li je validan
+				Claims claims = validateToken(request);
+				if (claims.get("authorities") != null) {
+					// ako je validan onda postavimo security context na osnovu toga sto smo
+					// iscitali iz tokena (roles)
+					setUpSpringAuthentication(claims);
+				} else {
+					// ako nije validan izbrisi sve iz konteksta
+					SecurityContextHolder.clearContext();
+				}
 			} else {
-				// ako nije validan izbrisi sve iz konteksta
+				// ako ne postoji jwt izbrisi sve iz konteksta
 				SecurityContextHolder.clearContext();
 			}
-		} else {
-			// ako ne postoji jwt izbrisi sve iz konteksta
-			SecurityContextHolder.clearContext();
+
+			// dodamo nas filter na ostale filtere
+			filterChain.doFilter(request, response);
+			
+		} catch (ExpiredJwtException e) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Niste se ulogovali ili je vasa sesija istekla.");
 		}
-
-		// dodamo nas filter na ostale filtere
-
-		filterChain.doFilter(request, response);
 	}
 
 	private boolean checkIfExists(HttpServletRequest request) {

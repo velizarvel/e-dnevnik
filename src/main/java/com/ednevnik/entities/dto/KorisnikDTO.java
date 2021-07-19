@@ -1,5 +1,6 @@
 package com.ednevnik.entities.dto;
 
+import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotBlank;
 
 import com.ednevnik.entities.EUlogaEntity;
@@ -30,5 +31,7 @@ public class KorisnikDTO {
 	private String prezime;
 
 	private String email;
+
+	private boolean obrisano = Boolean.FALSE;
 
 }

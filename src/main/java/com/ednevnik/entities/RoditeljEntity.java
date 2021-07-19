@@ -12,6 +12,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.ednevnik.security.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -22,11 +25,13 @@ import lombok.Setter;
 @Table(name = "roditelj")
 @Getter
 @Setter
+@SQLDelete(sql = "UPDATE korisnik SET obrisano = true WHERE id=?")
 public class RoditeljEntity extends KorisnikEntity {
-
-	@NotBlank(message = "Email is requested field")
+	
+	@JsonView(Views.RoditeljView.class)
+	@NotBlank(message = "Email je zahtevano polje")
 	private String email;
-
+	
 	@ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                 CascadeType.REFRESH,

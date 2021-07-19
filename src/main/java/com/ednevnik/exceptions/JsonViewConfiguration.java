@@ -31,14 +31,13 @@ public class JsonViewConfiguration extends AbstractMappingJacksonResponseBodyAdv
 
 			if (authorities.stream().anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_UCENIK.name()))) {
 				viewClass = Views.UcenikView.class;
-			}
-			if (authorities.stream().anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_RODITELJ.name()))) {
+			} else if (authorities.stream().anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_RODITELJ.name()))) {
 				viewClass = Views.RoditeljView.class;
-			}
-			if (authorities.stream().anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_NASTAVNIK.name()))) {
+			} else if (authorities.stream()
+					.anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_NASTAVNIK.name()))) {
 				viewClass = Views.NastavnikView.class;
-			}
-			if (authorities.stream().anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_ADMINISTRATOR.name()))) {
+			} else if (authorities.stream()
+					.anyMatch(o -> o.getAuthority().equals(EUlogaEntity.ROLE_ADMINISTRATOR.name()))) {
 				viewClass = Views.AdminView.class;
 			}
 		}
