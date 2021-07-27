@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +22,7 @@ import com.ednevnik.entities.PredmetEntity;
 import com.ednevnik.repositories.NastavnikRepository;
 import com.ednevnik.repositories.PredmetRepository;
 import com.ednevnik.security.Views;
-import com.ednevnik.service.KorisnikService;
+import com.ednevnik.services.KorisnikService;
 import com.ednevnik.utils.CustomValidation;
 import com.ednevnik.utils.RESTError;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -74,8 +72,8 @@ public class PredmetController {
 			return new ResponseEntity<>(
 					new RESTError(HttpStatus.BAD_REQUEST.value(), "Predmet sa id: " + id + " se ne nalazi u bazi"),
 					HttpStatus.BAD_REQUEST);
-
 		}
+		
 		return new ResponseEntity<>(predmet, HttpStatus.OK);
 	}
 

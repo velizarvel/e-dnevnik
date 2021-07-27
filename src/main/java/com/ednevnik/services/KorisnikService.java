@@ -1,4 +1,4 @@
-package com.ednevnik.service;
+package com.ednevnik.services;
 
 import com.ednevnik.entities.KorisnikEntity;
 import com.ednevnik.entities.dto.KorisnikDTO;

@@ -1,12 +1,13 @@
-package com.ednevnik.service;
+package com.ednevnik.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ednevnik.entities.EUlogaEntity;
 import com.ednevnik.entities.KorisnikEntity;
 import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.dto.KorisnikDTO;
+import com.ednevnik.exceptions.EntityNotFoundException;
+import com.ednevnik.exceptions.GlobalExceptionHandler;
 import com.ednevnik.facade.AuthenticationFacade;
 import com.ednevnik.repositories.KorisnikRepository;
 import com.ednevnik.utils.CustomValidation;
@@ -30,11 +31,8 @@ class KorisnikServiceImpl implements KorisnikService {
 	@Override
 	public KorisnikEntity updateKorisnik(KorisnikDTO korisnikDTO, Integer id) {
 
-		KorisnikEntity korisnik = korisnikRepository.findById(id).orElse(null);
-
-		if (korisnik == null) {
-			return null;
-		}
+		KorisnikEntity korisnik = korisnikRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Korisnik", id)));
 
 		if (korisnik instanceof RoditeljEntity) {
 			((RoditeljEntity) korisnik).setEmail(

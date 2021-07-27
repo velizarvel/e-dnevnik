@@ -68,4 +68,9 @@ public class PredmetEntity {
 	@Version
 	Integer verzija;
 
+	@Override
+	public String toString() {
+		return "id: " + id + ", predmet: " + nazivPredmeta;
+	}
+
 }

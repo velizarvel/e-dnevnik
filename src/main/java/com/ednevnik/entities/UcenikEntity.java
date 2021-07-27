@@ -1,7 +1,9 @@
 package com.ednevnik.entities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,9 +15,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.ednevnik.security.Views;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.Getter;
@@ -35,10 +38,12 @@ public class UcenikEntity extends KorisnikEntity {
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "ucenici")
 	@JsonView(Views.RoditeljView.class)
-	List<RoditeljEntity> roditelji = new ArrayList<RoditeljEntity>();
+	@JsonBackReference
+	Set<RoditeljEntity> roditelji = new HashSet<RoditeljEntity>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "ucenik")
 	@JsonView(Views.UcenikView.class)
+	@JsonIgnore
 	List<OcenaEntity> ocene = new ArrayList<OcenaEntity>();
 
 }

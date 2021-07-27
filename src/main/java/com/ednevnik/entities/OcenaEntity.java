@@ -39,26 +39,35 @@ public class OcenaEntity {
 
 	@Min(value = 1, message = "Najmanja ocena moze biti {value}")
 	@Max(value = 5, message = "Najveca ocena moze biti {value}")
-	@Column(name="vrednost_ocene")
-	@NotNull(message="Ocena mora biti uneta.")
+	@Column(name = "vrednost_ocene")
+	@NotNull(message = "Ocena mora biti uneta.")
 	@JsonView(Views.UcenikView.class)
-	private Integer ocena;
-	
-	@PastOrPresent(message="Datum ocene ne moze biti u buducem vremenu.")
+	private Integer vrednostOcene;
+
+	@PastOrPresent(message = "Datum ocene ne moze biti u buducem vremenu.")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	@JsonView(Views.UcenikView.class)
 	private LocalDate datum;
-	
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "ucenik_id")
 	@JsonView(Views.UcenikView.class)
 	private UcenikEntity ucenik;
-	
+
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "predmet_id")
 	@JsonView(Views.UcenikView.class)
 	private PredmetEntity predmet;
 
+	@JsonView(Views.UcenikView.class)
+	private String aktivnost;
+
 	@Version
 	Integer verzija;
+
+	@Override
+	public String toString() {
+		return "ocena: " + this.vrednostOcene + ", datum: " + this.datum + ", aktivnost: " + this.aktivnost;
+	}
+
 }

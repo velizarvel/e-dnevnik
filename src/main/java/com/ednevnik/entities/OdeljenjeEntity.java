@@ -2,8 +2,10 @@ package com.ednevnik.entities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -45,9 +47,9 @@ public class OdeljenjeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	
+
 	private boolean obrisano = Boolean.FALSE;
-	
+
 	@Min(value = 1, message = "Broj razreda moze biti najmanje {value}")
 	@Max(value = 8, message = "Broj razreda moze biti najvise {value}")
 	@NotNull(message = "Razred mora biti unet.")
@@ -69,10 +71,10 @@ public class OdeljenjeEntity {
 	@OneToMany(mappedBy = "odeljenje", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<UcenikEntity> ucenici = new ArrayList<>();
-	
+
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "odeljenja")
 	@JsonView(Views.RoditeljView.class)
-	List<NastavnikEntity> nastavnici = new ArrayList<NastavnikEntity>();
+	Set<NastavnikEntity> nastavnici = new HashSet<NastavnikEntity>();
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "predmet_nastavnik_map", joinColumns = {
@@ -85,7 +87,7 @@ public class OdeljenjeEntity {
 	@Version
 	@JsonView(Views.AdminView.class)
 	protected Integer verzija;
-	
+
 	public String getRazredIOdeljenje() {
 		int broj = this.razred;
 		String rezultat = "";
@@ -102,7 +104,7 @@ public class OdeljenjeEntity {
 				temp--;
 			}
 		}
-		return rezultat + "/" + this.odeljenje;
+		return rezultat + this.odeljenje;
 	}
 
 }

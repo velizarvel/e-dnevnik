@@ -1,8 +1,6 @@
 package com.ednevnik.entities;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -31,7 +29,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE korisnik SET obrisano = true WHERE id=?")
-//@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class NastavnikEntity extends KorisnikEntity {
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "nastavnici")
@@ -43,6 +41,7 @@ public class NastavnikEntity extends KorisnikEntity {
 	@JoinTable(name = "odeljenje_nastavnik", joinColumns = {
 			@JoinColumn(name = "nastavnik_id") }, inverseJoinColumns = { @JoinColumn(name = "odeljenje_id") })
 	@JsonView(Views.NastavnikView.class)
+	@JsonIgnore
 	Set<OdeljenjeEntity> odeljenja = new HashSet<OdeljenjeEntity>();
 
 }
