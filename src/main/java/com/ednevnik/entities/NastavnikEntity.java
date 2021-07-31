@@ -35,13 +35,13 @@ public class NastavnikEntity extends KorisnikEntity {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "nastavnici")
 	@JsonView(Views.NastavnikView.class)
 	@JsonBackReference
-	Set<PredmetEntity> predmeti = new HashSet<PredmetEntity>();
+	private Set<PredmetEntity> predmeti = new HashSet<PredmetEntity>();
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REFRESH, CascadeType.MERGE })
 	@JoinTable(name = "odeljenje_nastavnik", joinColumns = {
 			@JoinColumn(name = "nastavnik_id") }, inverseJoinColumns = { @JoinColumn(name = "odeljenje_id") })
 	@JsonView(Views.NastavnikView.class)
 	@JsonIgnore
-	Set<OdeljenjeEntity> odeljenja = new HashSet<OdeljenjeEntity>();
+	private Set<OdeljenjeEntity> odeljenja = new HashSet<OdeljenjeEntity>();
 
 }

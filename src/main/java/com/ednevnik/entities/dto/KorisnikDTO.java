@@ -2,7 +2,7 @@ package com.ednevnik.entities.dto;
 
 import javax.validation.constraints.NotBlank;
 
-import com.ednevnik.entities.EUlogaEntity;
+import com.ednevnik.entities.enums.EUlogaEntity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

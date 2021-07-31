@@ -1,4 +1,4 @@
-package com.ednevnik.entities;
+package com.ednevnik.entities.enums;
 
 public enum EUlogaEntity {
 	

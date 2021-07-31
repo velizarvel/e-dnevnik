@@ -16,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.ednevnik.entities.enums.EUlogaEntity;
 import com.ednevnik.security.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;

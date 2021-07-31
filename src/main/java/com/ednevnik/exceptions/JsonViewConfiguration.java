@@ -12,7 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJacksonResponseBodyAdvice;
 
-import com.ednevnik.entities.EUlogaEntity;
+import com.ednevnik.entities.enums.EUlogaEntity;
 import com.ednevnik.security.Views;
 
 @ControllerAdvice

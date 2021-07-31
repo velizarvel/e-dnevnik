@@ -74,7 +74,7 @@ public class OdeljenjeEntity {
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "odeljenja")
 	@JsonView(Views.RoditeljView.class)
-	Set<NastavnikEntity> nastavnici = new HashSet<NastavnikEntity>();
+	private Set<NastavnikEntity> nastavnici = new HashSet<NastavnikEntity>();
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "predmet_nastavnik_map", joinColumns = {

@@ -1,5 +1,9 @@
 package com.ednevnik.controllers;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ednevnik.entities.NastavnikEntity;
 import com.ednevnik.entities.PredmetEntity;
+import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.dto.NastavnikInfoDTO;
 import com.ednevnik.exceptions.EntityNotFoundException;
 import com.ednevnik.exceptions.GlobalExceptionHandler;
@@ -36,6 +41,23 @@ public class NastavnikController {
 
 	@Autowired
 	KorisnikService korisnikService;
+
+	@GetMapping()
+	@Secured("ROLE_ADMINISTRATOR")
+	public ResponseEntity<?> prikaziNastavnike() {
+
+		Set<NastavnikInfoDTO> nastavniciDTO = new HashSet<>();
+
+		List<NastavnikEntity> nastavnici = (List<NastavnikEntity>) nastavnikRepository.findAll();
+
+		nastavnici.forEach(n -> {
+			NastavnikInfoDTO nastavnikInfo = NastavnikMapper.INSTANCE.nastavnikEntityToNastavnikInfoDTO(n);
+			nastavnikService.addPredmetiIOdeljenja(nastavnikInfo, n);
+			nastavniciDTO.add(nastavnikInfo);
+		});
+
+		return new ResponseEntity<>(nastavniciDTO, HttpStatus.OK);
+	}
 
 	@Secured("ROLE_ADMINISTRATOR")
 	@GetMapping("/{id}")

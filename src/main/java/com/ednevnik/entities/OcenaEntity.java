@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,6 +20,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
+import com.ednevnik.entities.enums.EAktivnostEntity;
+import com.ednevnik.entities.enums.ESemestarEntity;
 import com.ednevnik.security.Views;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -60,14 +64,20 @@ public class OcenaEntity {
 	private PredmetEntity predmet;
 
 	@JsonView(Views.UcenikView.class)
-	private String aktivnost;
+	@Enumerated(EnumType.STRING)
+	private EAktivnostEntity aktivnost;
+
+	@JsonView(Views.UcenikView.class)
+	@Enumerated(EnumType.STRING)
+	private ESemestarEntity semestar;
 
 	@Version
-	Integer verzija;
+	private Integer verzija;
 
 	@Override
 	public String toString() {
-		return "ocena: " + this.vrednostOcene + ", datum: " + this.datum + ", aktivnost: " + this.aktivnost;
+		return "ocena: " + this.vrednostOcene + ", datum: " + this.datum + ", aktivnost: " + this.aktivnost
+				+ ", semestar: " + this.semestar;
 	}
 
 }

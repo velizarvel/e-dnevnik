@@ -11,4 +11,6 @@ public interface UcenikService {
 
 	public UcenikInfoDTO ucenikEntityToUcenikInfoDTO(UcenikEntity ucenik);
 
+	public void izracunajProsek(UcenikEntity ucenik);
+
 }

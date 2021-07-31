@@ -1,6 +1,6 @@
 package com.ednevnik.entities.dto;
 
-import com.ednevnik.entities.EUlogaEntity;
+import com.ednevnik.entities.enums.EUlogaEntity;
 import com.ednevnik.security.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 

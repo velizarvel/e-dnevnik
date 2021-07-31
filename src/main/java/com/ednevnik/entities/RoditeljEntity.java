@@ -37,7 +37,7 @@ public class RoditeljEntity extends KorisnikEntity {
 			@JoinColumn(name = "ucenik_id") })
 	@JsonManagedReference
 	@JsonView(Views.RoditeljView.class)
-	Set<UcenikEntity> ucenici = new HashSet<UcenikEntity>();
+	private Set<UcenikEntity> ucenici = new HashSet<UcenikEntity>();
 
 	@Override
 	public String toString() {

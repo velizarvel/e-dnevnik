@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.ednevnik.facade.AuthenticationFacade;
+import com.ednevnik.facades.AuthenticationFacade;
 import com.ednevnik.utils.RESTError;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -71,6 +71,15 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(TeacherAccessDeniedException.class)
 	public ResponseEntity<?> teacherAccessDeniedHandleError(TeacherAccessDeniedException e) {
+
+		log.warn(e.getMessage());
+
+		return new ResponseEntity<>(new RESTError(HttpStatus.FORBIDDEN.value(), e.getMessage()), HttpStatus.FORBIDDEN);
+	}
+	
+	
+	@ExceptionHandler(GradeException.class)
+	public ResponseEntity<?> gradeHandleError(GradeException e) {
 
 		log.warn(e.getMessage());
 

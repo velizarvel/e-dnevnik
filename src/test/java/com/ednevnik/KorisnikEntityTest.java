@@ -10,10 +10,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.Rollback;
 
-import com.ednevnik.entities.EUlogaEntity;
 import com.ednevnik.entities.KorisnikEntity;
 import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.dto.KorisnikDTO;
+import com.ednevnik.entities.enums.EUlogaEntity;
 import com.ednevnik.entities.factories.KorisnikFactory;
 import com.ednevnik.repositories.KorisnikRepository;
 import com.ednevnik.repositories.RoditeljRepository;

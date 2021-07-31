@@ -16,7 +16,10 @@ import com.ednevnik.entities.PredmetEntity;
 import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.UcenikEntity;
 import com.ednevnik.entities.dto.UcenikInfoDTO;
+import com.ednevnik.entities.enums.EAktivnostEntity;
+import com.ednevnik.entities.enums.ESemestarEntity;
 import com.ednevnik.mappers.UcenikMapper;
+import com.ednevnik.repositories.OcenaRepository;
 import com.ednevnik.repositories.PredmetRepository;
 import com.ednevnik.repositories.UcenikRepository;
 
@@ -24,13 +27,19 @@ import com.ednevnik.repositories.UcenikRepository;
 public class UcenikServiceImpl implements UcenikService {
 
 	@Autowired
-	KorisnikService korisnikService;
+	private KorisnikService korisnikService;
 
 	@Autowired
-	UcenikRepository ucenikRepository;
+	private UcenikRepository ucenikRepository;
 
 	@Autowired
 	PredmetRepository predmetRepository;
+
+	@Autowired
+	private OcenaRepository ocenaRepository;
+
+	@Autowired
+	private SemestarService semestarService;
 
 	@Override
 	public Set<UcenikInfoDTO> prikaziUcenike() {
@@ -76,12 +85,36 @@ public class UcenikServiceImpl implements UcenikService {
 		for (PredmetEntity predmet : predmeti) {
 			List<String> ocene = new ArrayList<String>();
 			for (OcenaEntity ocena : predmet.getOcene()) {
-				ocene.add(ocena.toString());
+				if (ocena.getUcenik().equals(ucenik)) {
+					ocene.add(ocena.toString());
+				}
 			}
 			ucenikInfo.getPodaciOOcenama().put(predmet.toString(), ocene);
 		}
 
 		return ucenikInfo;
+	}
+
+	public void izracunajProsek(UcenikEntity ucenik) {
+		int brojPredmeta = ucenik.getOdeljenje().getPredmetNastavnikMapa().size();
+		List<OcenaEntity> zakljuceneOcene = ocenaRepository.pronadjiZakljuceneOceneZaUcenika(ucenik,
+				EAktivnostEntity.ZAKLJUCNA_OCENA, semestarService.getESemestar());
+
+		if (brojPredmeta > zakljuceneOcene.size()) {
+			return;
+		}
+
+		Double sum = zakljuceneOcene.stream().mapToDouble(x -> x.getVrednostOcene()).average().orElse(0.0);
+
+		if (semestarService.getESemestar().equals(ESemestarEntity.PRVO_POLUGODISTE)) {
+			ucenik.setProsekPolugodiste(sum);
+			ucenik.setUspehPolugodiste(ucenik.getEUspehPolugodiste());
+		} else if (semestarService.getESemestar().equals(ESemestarEntity.PRVO_POLUGODISTE)) {
+			ucenik.setProsekKrajGodine(sum);
+			ucenik.setUspehKrajGodine(ucenik.getEUspehKrajGodine());
+		}
+
+		ucenikRepository.save(ucenik);
 	}
 
 }

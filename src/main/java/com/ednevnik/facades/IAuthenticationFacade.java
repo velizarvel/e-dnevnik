@@ -1,4 +1,4 @@
-package com.ednevnik.facade;
+package com.ednevnik.facades;
 
 import org.springframework.security.core.Authentication;
 

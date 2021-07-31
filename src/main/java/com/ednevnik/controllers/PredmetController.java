@@ -1,7 +1,5 @@
 package com.ednevnik.controllers;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ednevnik.entities.NastavnikEntity;
 import com.ednevnik.entities.PredmetEntity;
+import com.ednevnik.exceptions.EntityNotFoundException;
+import com.ednevnik.exceptions.GlobalExceptionHandler;
 import com.ednevnik.repositories.NastavnikRepository;
 import com.ednevnik.repositories.PredmetRepository;
 import com.ednevnik.security.Views;
@@ -67,13 +67,9 @@ public class PredmetController {
 	@GetMapping("/{id}")
 	@Secured("ROLE_ADMINISTRATOR")
 	public ResponseEntity<?> pronadjiPredmetPoId(@PathVariable Integer id) {
-		PredmetEntity predmet = predmetRepository.findById(id).orElse(null);
-		if (predmet == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Predmet sa id: " + id + " se ne nalazi u bazi"),
-					HttpStatus.BAD_REQUEST);
-		}
-		
+		PredmetEntity predmet = predmetRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Predmet", id)));
+
 		return new ResponseEntity<>(predmet, HttpStatus.OK);
 	}
 
@@ -82,18 +78,11 @@ public class PredmetController {
 	public ResponseEntity<?> dodajNastavnikaKojiPredaje(@PathVariable Integer predmetId,
 			@PathVariable Integer nastavnikId) {
 
-		NastavnikEntity nastavnik = nastavnikRepository.findById(nastavnikId).orElse(null);
-		if (nastavnik == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Nije pronadjen predmet sa id: " + nastavnikId + "."),
-					HttpStatus.BAD_REQUEST);
-		}
-		PredmetEntity predmet = predmetRepository.findById(predmetId).orElse(null);
-		if (predmet == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Nije pronadjen predmet sa id: " + predmetId + "."),
-					HttpStatus.BAD_REQUEST);
-		}
+		NastavnikEntity nastavnik = nastavnikRepository.findById(nastavnikId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Nastavnik", nastavnikId)));
+
+		PredmetEntity predmet = predmetRepository.findById(predmetId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Predmet", predmetId)));
 
 		predmet.getNastavnici().add(nastavnik);
 
@@ -108,17 +97,14 @@ public class PredmetController {
 	@Secured("ROLE_ADMINISTRATOR")
 	public ResponseEntity<?> azurirajPredmet(@Valid @RequestParam Integer fondCasova,
 			@Valid @RequestParam String nazivPredmeta, @PathVariable Integer id) {
-		Optional<PredmetEntity> predmetDb = predmetRepository.findById(id);
-		if (!predmetDb.isPresent()) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Nije pronadjen predmet sa id: " + id + "."),
-					HttpStatus.BAD_REQUEST);
-		}
-		predmetDb.get().setFondCasova(CustomValidation.setIfNotNull(predmetDb.get().getFondCasova(), fondCasova));
-		predmetDb.get()
-				.setNazivPredmeta(CustomValidation.setIfNotNull(predmetDb.get().getNazivPredmeta(), nazivPredmeta));
 
-		return new ResponseEntity<>(predmetRepository.save(predmetDb.get()), HttpStatus.OK);
+		PredmetEntity predmetDb = predmetRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Predmet", id)));
+
+		predmetDb.setFondCasova(CustomValidation.setIfNotNull(predmetDb.getFondCasova(), fondCasova));
+		predmetDb.setNazivPredmeta(CustomValidation.setIfNotNull(predmetDb.getNazivPredmeta(), nazivPredmeta));
+
+		return new ResponseEntity<>(predmetRepository.save(predmetDb), HttpStatus.OK);
 	}
 
 	// DELETE
@@ -127,14 +113,11 @@ public class PredmetController {
 	@Secured("ROLE_ADMINISTRATOR")
 	@JsonView(Views.AdminView.class)
 	public ResponseEntity<?> izbrisiPredmet(@PathVariable Integer id) {
-		Optional<PredmetEntity> predmet = predmetRepository.findById(id);
-		if (!predmet.isPresent()) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Nije pronadjen predmet sa id: " + id + "."),
-					HttpStatus.BAD_REQUEST);
-		}
-		predmetRepository.delete(predmet.get());
-		String message = "Korisnik " + korisnikService.getKorisnik() + " je obrisao predmet sa id: " + id + ".";
+		PredmetEntity predmet = predmetRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Predmet", id)));
+
+		predmetRepository.delete(predmet);
+		String message = "Korisnik " + korisnikService.getKorisnik().getKorisnickoIme() + " je obrisao predmet sa id: " + id + ".";
 		log.info(message);
 		return new ResponseEntity<>(new RESTError(HttpStatus.OK.value(), message), HttpStatus.OK);
 	}

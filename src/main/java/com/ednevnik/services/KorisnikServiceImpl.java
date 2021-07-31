@@ -8,7 +8,7 @@ import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.dto.KorisnikDTO;
 import com.ednevnik.exceptions.EntityNotFoundException;
 import com.ednevnik.exceptions.GlobalExceptionHandler;
-import com.ednevnik.facade.AuthenticationFacade;
+import com.ednevnik.facades.AuthenticationFacade;
 import com.ednevnik.repositories.KorisnikRepository;
 import com.ednevnik.utils.CustomValidation;
 

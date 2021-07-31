@@ -3,7 +3,7 @@ package com.ednevnik.security;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ednevnik.entities.EUlogaEntity;
+import com.ednevnik.entities.enums.EUlogaEntity;
 
 public class Views {
 	

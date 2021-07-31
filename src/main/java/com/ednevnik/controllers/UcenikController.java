@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ednevnik.entities.OdeljenjeEntity;
 import com.ednevnik.entities.UcenikEntity;
 import com.ednevnik.entities.dto.UcenikInfoDTO;
+import com.ednevnik.exceptions.EntityNotFoundException;
+import com.ednevnik.exceptions.GlobalExceptionHandler;
 import com.ednevnik.repositories.OdeljenjeRepository;
 import com.ednevnik.repositories.UcenikRepository;
 import com.ednevnik.services.UcenikService;
-import com.ednevnik.utils.RESTError;
 
 @RestController
 @RequestMapping("ucenici")
@@ -45,21 +46,20 @@ public class UcenikController {
 	@Secured("ROLE_ADMINISTRATOR")
 	@PutMapping("/{id}/{odeljenjeId}")
 	public ResponseEntity<?> upsertOdeljenje(@PathVariable Integer id, @PathVariable Integer odeljenjeId) {
-		UcenikEntity ucenik = ucenikRepository.findById(id).orElse(null);
-		if (ucenik == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Ucenik sa id: " + id + " se ne nalazi u bazi"),
-					HttpStatus.BAD_REQUEST);
-		}
-		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(odeljenjeId).orElse(null);
-		if (odeljenje == null) {
-			return new ResponseEntity<>(new RESTError(HttpStatus.BAD_REQUEST.value(),
-					"Odeljenje sa id: " + odeljenjeId + " se ne nalazi u bazi"), HttpStatus.BAD_REQUEST);
-		}
+
+		UcenikEntity ucenik = ucenikRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Ucenik", id)));
+
+		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(odeljenjeId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", odeljenjeId)));
+
 		ucenik.setOdeljenje(odeljenje);
 		ucenikRepository.save(ucenik);
 
 		return new ResponseEntity<>(ucenik, HttpStatus.OK);
 	}
+	
+	
+	
 
 }

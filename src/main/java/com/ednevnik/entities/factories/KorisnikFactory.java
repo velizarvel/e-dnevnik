@@ -1,11 +1,11 @@
 package com.ednevnik.entities.factories;
 
-import com.ednevnik.entities.EUlogaEntity;
 import com.ednevnik.entities.KorisnikEntity;
 import com.ednevnik.entities.NastavnikEntity;
 import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.UcenikEntity;
 import com.ednevnik.entities.dto.KorisnikDTO;
+import com.ednevnik.entities.enums.EUlogaEntity;
 import com.ednevnik.utils.Encryption;
 
 public class KorisnikFactory {

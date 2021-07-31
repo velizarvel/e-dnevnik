@@ -24,6 +24,7 @@ import com.ednevnik.entities.OdeljenjeEntity;
 import com.ednevnik.entities.UcenikEntity;
 import com.ednevnik.entities.dto.KorisnikDTO;
 import com.ednevnik.entities.dto.KorisnikInfoDTO;
+import com.ednevnik.entities.enums.EUlogaEntity;
 import com.ednevnik.entities.factories.KorisnikFactory;
 import com.ednevnik.exceptions.EntityNotFoundException;
 import com.ednevnik.exceptions.GlobalExceptionHandler;
@@ -73,7 +74,8 @@ public class KorisnikController {
 
 		korisnikRepository.save(noviKorisnik);
 		log.info(korisnikService.getKorisnik() + " je kreirao korisnika sa ulogom " + korisnik.getUloga() + ".");
-		return new ResponseEntity<>(noviKorisnik, HttpStatus.OK);
+		KorisnikInfoDTO korisnikInfo = KorisnikMapper.INSTANCE.korisnikEntityToKorisnikInfoDTO(noviKorisnik);
+		return new ResponseEntity<>(korisnikInfo, HttpStatus.OK);
 	}
 
 	@Secured("ROLE_ADMINISTRATOR")
@@ -89,6 +91,17 @@ public class KorisnikController {
 
 		for (KorisnikDTO korisnik : korisnici) {
 			KorisnikEntity noviKorisnik = KorisnikFactory.createKorisnik(korisnik);
+			
+			if (noviKorisnik instanceof UcenikEntity) {
+				if (korisnik.getOdeljenjeId() == null) {
+					throw new EntityNotFoundException(
+							GlobalExceptionHandler.getMessage("Odeljenje", korisnik.getOdeljenjeId()));
+				}
+				OdeljenjeEntity odeljenje = odeljenjeRepository.findById(korisnik.getOdeljenjeId())
+						.orElseThrow(() -> new EntityNotFoundException(
+								GlobalExceptionHandler.getMessage("Odeljenje", korisnik.getOdeljenjeId())));
+				((UcenikEntity) noviKorisnik).setOdeljenje(odeljenje);
+			}
 
 			noviKorisnici.add(noviKorisnik);
 		}
@@ -156,6 +169,17 @@ public class KorisnikController {
 
 		KorisnikEntity korisnik = korisnikRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Korisnik", id)));
+
+		if (korisnik.getUloga().equals(EUlogaEntity.ROLE_ADMINISTRATOR)) {
+			List<KorisnikEntity> korisnici = korisnikRepository.findByUloga(EUlogaEntity.ROLE_ADMINISTRATOR);
+			if (korisnici.size() == 1) {
+				return new ResponseEntity<>(
+						new RESTError(HttpStatus.FORBIDDEN.value(),
+								"Korisnik " + korisnik.getKorisnickoIme()
+										+ " se ne moze obrisati, jer je jedini administrator u bazi."),
+						HttpStatus.FORBIDDEN);
+			}
+		}
 
 		korisnikRepository.deleteById(korisnik.getId());
 

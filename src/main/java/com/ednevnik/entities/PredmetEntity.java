@@ -42,31 +42,31 @@ public class PredmetEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@JsonView(Views.AdminView.class)
-	Integer id;
+	private Integer id;
 
 	@Column(name = "naziv_predmeta")
 	@NotBlank(message = "Naziv predmeta mora biti unet.")
 	@JsonView(Views.UcenikView.class)
-	String nazivPredmeta;
+	private String nazivPredmeta;
 
 	@Column(name = "fond_casova")
 	@NotNull(message = "Fond casova mora biti unet.")
 	@JsonView(Views.UcenikView.class)
-	Integer fondCasova;
+	private Integer fondCasova;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REFRESH, CascadeType.MERGE })
 	@JoinTable(name = "predmet_nastavnik", joinColumns = { @JoinColumn(name = "predmet_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "nastavnik_id") })
 	@JsonView(Views.RoditeljView.class)
 	@JsonManagedReference
-	Set<NastavnikEntity> nastavnici = new HashSet<NastavnikEntity>();
+	private Set<NastavnikEntity> nastavnici = new HashSet<NastavnikEntity>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "predmet")
 	@JsonIgnore
-	List<OcenaEntity> ocene = new ArrayList<OcenaEntity>();
+	 List<OcenaEntity> ocene = new ArrayList<OcenaEntity>();
 
 	@Version
-	Integer verzija;
+	private Integer verzija;
 
 	@Override
 	public String toString() {

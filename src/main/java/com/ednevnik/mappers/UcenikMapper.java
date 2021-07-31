@@ -20,8 +20,13 @@ public abstract class UcenikMapper {
 
 	@Mappings({ @Mapping(target = "id", source = "entity.id"),
 			@Mapping(target = "korisnickoIme", source = "entity.korisnickoIme"),
-			@Mapping(target = "uloga", source = "entity.uloga"), @Mapping(target = "podaciORoditeljima", ignore = true),
-			@Mapping(target = "podaciOOcenama", ignore = true), @Mapping(target = "razredIOdeljenje", ignore = true),
+			@Mapping(target = "uloga", source = "entity.uloga"),
+			@Mapping(target = "prosekPolugodiste", source = "entity.prosekPolugodiste"),
+			@Mapping(target = "prosekKrajGodine", source = "entity.prosekKrajGodine"),
+			@Mapping(target = "uspehPolugodiste", source = "entity.uspehPolugodiste"),
+			@Mapping(target = "uspehKrajGodine", source = "entity.uspehKrajGodine"),
+			@Mapping(target = "podaciORoditeljima", ignore = true), @Mapping(target = "podaciOOcenama", ignore = true),
+			@Mapping(target = "razredIOdeljenje", ignore = true),
 			@Mapping(target = "imeIPrezime", expression = "java(entity.getIme() + \" \" + entity.getPrezime())") })
 	public abstract UcenikInfoDTO ucenikEntityToUcenikInfoDTO(UcenikEntity entity);
 

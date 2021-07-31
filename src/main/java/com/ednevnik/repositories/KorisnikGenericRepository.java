@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.ednevnik.entities.EUlogaEntity;
 import com.ednevnik.entities.KorisnikEntity;
+import com.ednevnik.entities.enums.EUlogaEntity;
 
 public interface KorisnikGenericRepository<T extends KorisnikEntity> extends CrudRepository<T, Integer> {
 

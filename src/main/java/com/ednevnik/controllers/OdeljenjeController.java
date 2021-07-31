@@ -20,9 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ednevnik.entities.NastavnikEntity;
 import com.ednevnik.entities.OdeljenjeEntity;
 import com.ednevnik.entities.PredmetEntity;
+import com.ednevnik.exceptions.EntityNotFoundException;
+import com.ednevnik.exceptions.GlobalExceptionHandler;
 import com.ednevnik.repositories.NastavnikRepository;
 import com.ednevnik.repositories.OdeljenjeRepository;
 import com.ednevnik.repositories.PredmetRepository;
+import com.ednevnik.services.KorisnikService;
 import com.ednevnik.services.OdeljenjeService;
 import com.ednevnik.utils.RESTError;
 
@@ -45,6 +48,9 @@ public class OdeljenjeController {
 	@Autowired
 	private NastavnikRepository nastavnikRepository;
 
+	@Autowired
+	private KorisnikService korisnikService;
+
 	// CREATE
 
 	@PostMapping
@@ -64,6 +70,7 @@ public class OdeljenjeController {
 
 	// READ
 
+	@Secured("ROLE_ADMINISTRATOR")
 	@GetMapping
 	public ResponseEntity<?> prikaziSvaOdeljenja() {
 		return new ResponseEntity<>(odeljenjeRepository.findAll(), HttpStatus.OK);
@@ -71,14 +78,30 @@ public class OdeljenjeController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> pronadjiPredmetPoId(@PathVariable Integer id) {
-		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(id).orElse(null);
-		if (odeljenje == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Odeljenje sa id: " + id + " se ne nalazi u bazi"),
-					HttpStatus.BAD_REQUEST);
+		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", id)));
 
-		}
 		return new ResponseEntity<>(odeljenje, HttpStatus.OK);
+	}
+
+	@GetMapping("/{id}/predmetiINastavnici")
+	public ResponseEntity<?> prikaziSvePredmeteINastavnike(@PathVariable Integer id) {
+		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", id)));
+
+		return new ResponseEntity<>(odeljenje.getPredmetNastavnikMapa(), HttpStatus.OK);
+	}
+
+	@GetMapping("/{odeljenjeId}/{predmetId}")
+	public ResponseEntity<?> pronadjiPredmetPoId(@PathVariable Integer odeljenjeId, @PathVariable Integer predmetId) {
+		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(odeljenjeId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", odeljenjeId)));
+
+		PredmetEntity predmet = predmetRepository.findById(predmetId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Predmet", predmetId)));
+
+		return new ResponseEntity<>(odeljenjeService.getNastavnikKojiPredajePredmetOdeljenju(odeljenje, predmet),
+				HttpStatus.OK);
 	}
 
 	// UPDATE
@@ -91,12 +114,6 @@ public class OdeljenjeController {
 
 		OdeljenjeEntity odeljenje = odeljenjeService.updateOdeljenje(razred, brojOdeljenja, generacija, id);
 
-		if (odeljenje == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Odeljenje sa id: " + id + " se ne nalazi u bazi"),
-					HttpStatus.BAD_REQUEST);
-		}
-
 		log.info("Azurirano je odeljenje " + odeljenje.getRazredIOdeljenje());
 		return new ResponseEntity<>(odeljenje, HttpStatus.CREATED);
 	}
@@ -105,21 +122,15 @@ public class OdeljenjeController {
 	@Secured("ROLE_ADMINISTRATOR")
 	public ResponseEntity<?> dodajPredmetINastavnika(@PathVariable Integer odeljenjeId, @PathVariable Integer predmetId,
 			@PathVariable Integer nastavnikId) {
-		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(odeljenjeId).orElse(null);
-		if (odeljenje == null) {
-			return new ResponseEntity<>(new RESTError(HttpStatus.BAD_REQUEST.value(),
-					"Odeljenje sa id: " + odeljenjeId + " se ne nalazi u bazi"), HttpStatus.BAD_REQUEST);
-		}
-		PredmetEntity predmet = predmetRepository.findById(predmetId).orElse(null);
-		if (predmet == null) {
-			return new ResponseEntity<>(new RESTError(HttpStatus.BAD_REQUEST.value(),
-					"Predmet sa id: " + predmetId + " se ne nalazi u bazi"), HttpStatus.BAD_REQUEST);
-		}
-		NastavnikEntity nastavnik = nastavnikRepository.findById(nastavnikId).orElse(null);
-		if (nastavnik == null) {
-			return new ResponseEntity<>(new RESTError(HttpStatus.BAD_REQUEST.value(),
-					"Nastavnik sa id: " + nastavnikId + " se ne nalazi u bazi"), HttpStatus.BAD_REQUEST);
-		}
+		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(odeljenjeId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", odeljenjeId)));
+
+		PredmetEntity predmet = predmetRepository.findById(predmetId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Predmet", predmetId)));
+
+		NastavnikEntity nastavnik = nastavnikRepository.findById(nastavnikId).orElseThrow(
+				() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Nastavnik", nastavnikId)));
+
 		Map<PredmetEntity, NastavnikEntity> predmetNastavnikMapa = odeljenjeService.dodajPredmetINastavnika(odeljenje,
 				nastavnik, predmet);
 
@@ -130,6 +141,9 @@ public class OdeljenjeController {
 					HttpStatus.BAD_REQUEST);
 		}
 
+		log.info("Dodat je nastavnik " + nastavnik.getKorisnickoIme() + " " + nastavnik.getPrezime()
+				+ " da predaje predmet " + predmet.getNazivPredmeta() + " u odeljenju "
+				+ odeljenje.getRazredIOdeljenje());
 		return new ResponseEntity<>(predmetNastavnikMapa, HttpStatus.OK);
 	}
 
@@ -138,17 +152,19 @@ public class OdeljenjeController {
 	@Secured("ROLE_ADMINISTRATOR")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> izbrisiOdeljenje(@PathVariable Integer id) {
-		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(id).orElse(null);
-		if (odeljenje == null) {
-			return new ResponseEntity<>(
-					new RESTError(HttpStatus.BAD_REQUEST.value(), "Odeljenje sa id: " + id + " se ne nalazi u bazi"),
-					HttpStatus.BAD_REQUEST);
+		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", id)));
 
-		}
 		odeljenjeRepository.delete(odeljenje);
+
+		log.info("Korisnik " + korisnikService.getKorisnik().getKorisnickoIme() + " je obrisao odeljenje sa id: " + id
+				+ ".");
+
 		return new ResponseEntity<>(
 				new RESTError(HttpStatus.OK.value(), "Uspesno je obrisano odeljenje sa id: " + id + "."),
 				HttpStatus.OK);
 	}
+	
+	
 
 }
