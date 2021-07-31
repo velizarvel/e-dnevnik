@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ednevnik.entities.KorisnikEntity;
@@ -33,6 +34,7 @@ import com.ednevnik.repositories.KorisnikRepository;
 import com.ednevnik.repositories.OdeljenjeRepository;
 import com.ednevnik.services.KorisnikService;
 import com.ednevnik.utils.BindingErrorMessage;
+import com.ednevnik.utils.Encryption;
 import com.ednevnik.utils.RESTError;
 
 import lombok.extern.log4j.Log4j2;
@@ -91,7 +93,7 @@ public class KorisnikController {
 
 		for (KorisnikDTO korisnik : korisnici) {
 			KorisnikEntity noviKorisnik = KorisnikFactory.createKorisnik(korisnik);
-			
+
 			if (noviKorisnik instanceof UcenikEntity) {
 				if (korisnik.getOdeljenjeId() == null) {
 					throw new EntityNotFoundException(
@@ -155,6 +157,27 @@ public class KorisnikController {
 
 		KorisnikEntity korisnikDb = korisnikService.updateKorisnik(korisnikDTO, id);
 
+		korisnikRepository.save(korisnikDb);
+		log.info(korisnikService.getKorisnik() + " je azurirao korisnika sa id: " + id + ".");
+
+		return new ResponseEntity<>(korisnikDb, HttpStatus.OK);
+	}
+
+	@Secured("ROLE_ADMINISTRATOR")
+	@PutMapping("sifra/{id}")
+	public ResponseEntity<?> promeniSifru(@RequestParam String novaSifra, @RequestParam String staraSifra,
+			@PathVariable Integer id) {
+
+		KorisnikEntity korisnikDb = korisnikRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Korisnik", id)));
+
+		if (!Encryption.validatePassword(staraSifra, korisnikDb.getSifra())) {
+			return new ResponseEntity<>(new RESTError(HttpStatus.FORBIDDEN.value(),
+					"Nepravilno unesena trenutna sifra."),
+					HttpStatus.FORBIDDEN);
+		}
+
+		korisnikDb.setSifra(Encryption.getPassEncoded(novaSifra));
 		korisnikRepository.save(korisnikDb);
 		log.info(korisnikService.getKorisnik() + " je azurirao korisnika sa id: " + id + ".");
 

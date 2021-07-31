@@ -85,9 +85,7 @@ public class UcenikServiceImpl implements UcenikService {
 		for (PredmetEntity predmet : predmeti) {
 			List<String> ocene = new ArrayList<String>();
 			for (OcenaEntity ocena : predmet.getOcene()) {
-				if (ocena.getUcenik().equals(ucenik)) {
-					ocene.add(ocena.toString());
-				}
+				ocene.add(ocena.toString());
 			}
 			ucenikInfo.getPodaciOOcenama().put(predmet.toString(), ocene);
 		}
@@ -109,7 +107,7 @@ public class UcenikServiceImpl implements UcenikService {
 		if (semestarService.getESemestar().equals(ESemestarEntity.PRVO_POLUGODISTE)) {
 			ucenik.setProsekPolugodiste(sum);
 			ucenik.setUspehPolugodiste(ucenik.getEUspehPolugodiste());
-		} else if (semestarService.getESemestar().equals(ESemestarEntity.PRVO_POLUGODISTE)) {
+		} else if (semestarService.getESemestar().equals(ESemestarEntity.DRUGO_POLUGODISTE)) {
 			ucenik.setProsekKrajGodine(sum);
 			ucenik.setUspehKrajGodine(ucenik.getEUspehKrajGodine());
 		}

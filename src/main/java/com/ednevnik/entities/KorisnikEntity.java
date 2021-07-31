@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.validation.constraints.NotBlank;
 
@@ -41,7 +42,7 @@ public class KorisnikEntity {
 	@JsonView(Views.AdminView.class)
 	private Integer id;
 
-	@Column(name = "korisnicko_ime")
+	@Column(name = "korisnicko_ime", unique = true)
 	@JsonView(Views.UcenikView.class)
 	@NotBlank(message = "Korisnicko ime ne moze biti prazno polje")
 	private String korisnickoIme;

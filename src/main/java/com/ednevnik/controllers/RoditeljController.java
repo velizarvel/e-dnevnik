@@ -1,7 +1,6 @@
 package com.ednevnik.controllers;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.UcenikEntity;
-import com.ednevnik.entities.dto.UcenikInfoDTO;
 import com.ednevnik.exceptions.EntityNotFoundException;
 import com.ednevnik.exceptions.GlobalExceptionHandler;
 import com.ednevnik.repositories.RoditeljRepository;

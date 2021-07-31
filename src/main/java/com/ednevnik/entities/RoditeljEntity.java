@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -29,6 +30,7 @@ import lombok.Setter;
 public class RoditeljEntity extends KorisnikEntity {
 
 	@JsonView(Views.RoditeljView.class)
+	@Column(unique = true)
 	@NotBlank(message = "Email je zahtevano polje")
 	private String email;
 

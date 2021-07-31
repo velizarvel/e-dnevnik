@@ -44,7 +44,7 @@ public class PredmetEntity {
 	@JsonView(Views.AdminView.class)
 	private Integer id;
 
-	@Column(name = "naziv_predmeta")
+	@Column(name = "naziv_predmeta", unique=true)
 	@NotBlank(message = "Naziv predmeta mora biti unet.")
 	@JsonView(Views.UcenikView.class)
 	private String nazivPredmeta;

@@ -41,6 +41,7 @@ class KorisnikServiceImpl implements KorisnikService {
 
 		korisnik.setIme(CustomValidation.setIfNotNull(korisnik.getIme(), korisnikDTO.getIme()));
 		korisnik.setPrezime(CustomValidation.setIfNotNull(korisnik.getPrezime(), korisnikDTO.getPrezime()));
+		korisnik.setKorisnickoIme(CustomValidation.setIfNotNull(korisnik.getKorisnickoIme(), korisnikDTO.getKorisnickoIme()));
 
 		return korisnik;
 	}

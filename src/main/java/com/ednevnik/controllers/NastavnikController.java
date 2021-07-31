@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ednevnik.entities.NastavnikEntity;
 import com.ednevnik.entities.PredmetEntity;
-import com.ednevnik.entities.RoditeljEntity;
 import com.ednevnik.entities.dto.NastavnikInfoDTO;
 import com.ednevnik.exceptions.EntityNotFoundException;
 import com.ednevnik.exceptions.GlobalExceptionHandler;

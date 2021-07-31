@@ -57,10 +57,10 @@ public class SemestarController {
 	@Secured("ROLE_ADMINISTRATOR")
 	@PutMapping
 	public ResponseEntity<?> izmeniSemestar(@RequestParam ESemestarEntity eSemestar) {
-		SemestarEntity semestar = new SemestarEntity();
+		SemestarEntity semestar = semestarService.getSemestar();
 		semestar.setESemestar(eSemestar);
 		semestarRepository.save(semestar);
-		log.info(korisnikService.getKorisnik() + " je kreirao novi semestar.");
+		log.info(korisnikService.getKorisnik() + " je izmenio semestar.");
 		return new ResponseEntity<>(semestar, HttpStatus.OK);
 	}
 }

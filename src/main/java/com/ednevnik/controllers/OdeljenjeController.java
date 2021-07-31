@@ -155,6 +155,11 @@ public class OdeljenjeController {
 		OdeljenjeEntity odeljenje = odeljenjeRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException(GlobalExceptionHandler.getMessage("Odeljenje", id)));
 
+		if (odeljenje.getUcenici().size() > 0) {
+			return new ResponseEntity<>(new RESTError(HttpStatus.OK.value(), "Ne moze se obrisati odeljenje : " + id
+					+ " jer je povezano sa " + odeljenje.getUcenici().size() + " ucenika."), HttpStatus.OK);
+		}
+
 		odeljenjeRepository.delete(odeljenje);
 
 		log.info("Korisnik " + korisnikService.getKorisnik().getKorisnickoIme() + " je obrisao odeljenje sa id: " + id
@@ -164,7 +169,5 @@ public class OdeljenjeController {
 				new RESTError(HttpStatus.OK.value(), "Uspesno je obrisano odeljenje sa id: " + id + "."),
 				HttpStatus.OK);
 	}
-	
-	
 
 }
